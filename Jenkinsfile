@@ -53,11 +53,11 @@ pipeline {
     stage('Push images to ACR') {
         steps{
             withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'acr-credentials',usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-            sh "docker login ${env.ACR_LOGINSERVER} -u $USERNAME -p $PASSWORD"
+            sh "docker login -u $USERNAME -p $PASSWORD"
             sh "docker push ${env.API_IMAGE}:${env.BUILD_NUMBER}"
             sh "docker tag ${env.API_IMAGE}:${env.BUILD_NUMBER} ${env.API_IMAGE}:latest"
             sh "docker push ${env.API_IMAGE}:latest"
-            sh "docker login ${env.ACR_LOGINSERVER} -u $USERNAME -p $PASSWORD"
+           
             sh "docker push ${env.WEB_IMAGE}:${env.BUILD_NUMBER}"
             sh "docker tag ${env.WEB_IMAGE}:${env.BUILD_NUMBER} ${env.WEB_IMAGE}:latest"
             sh "docker push ${env.WEB_IMAGE}:latest"
