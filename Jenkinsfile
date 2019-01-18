@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        GIT_REPO = "https://github.com/comparexoss/cpx-oss2-workshop.git"
+        GIT_REPO = "https://github.com/comparexoss/datapare.git"
         ACR_LOGINSERVER = "hakkiogretmen"
         //ACR_REPO = 'mstrdevopsworkshop'
         ACR_CRED = credentials('acr-credentials')
