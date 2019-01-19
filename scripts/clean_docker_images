@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo $1
+echo $2
+echo $3
+
+BUILD_ID=$1
+AGE=$2
+START_NUMBER=$(expr $BUILD_ID - $AGE + 1)
+IMAGE_NAME=$3
+
+args=($(seq $START_NUMBER 1 $BUILD_ID))
+echo "${args[@]}"
+EXCLUDED_NUMBERS=$(echo ${args[@]}|tr " " "|")
+
+if [[ $(docker images $IMAGE_NAME --format "{{.Repository}}:{{.Tag}}" | grep -Eo "$IMAGE_NAME:([0-9].*)" | grep -Ev $EXCLUDED_NUMBERS) ]]; then
+        docker rmi $(docker images $IMAGE_NAME --format "{{.Repository}}:{{.Tag}}" | grep -Eo "$IMAGE_NAME:([0-9].*)" | grep -Ev $EXCLUDED_NUMBERS)
+else
+        echo "Nothing found to delete!"
+fi

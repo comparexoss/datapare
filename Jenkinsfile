@@ -8,7 +8,12 @@ pipeline {
         WEB_IMAGE="${env.ACR_LOGINSERVER}/rating-web"
         //API_IMAGE="${env.ACR_LOGINSERVER}/${env.ACR_REPO}/rating-api"
         API_IMAGE="${env.ACR_LOGINSERVER}/rating-api"
-        //DB_IMAGE="${env.ACR_LOGINSERVER}/${env.ACR_REPO}/rating-db"
+        //use that config to remove old images
+        IMAGE_AGE=15
+        //use that configs to scale container instances. Pass these variables to python script
+        WEB_CNTNR_COUNT=15
+        API_CNTNR_COUNT=5
+
     }
   options { 
       disableConcurrentBuilds() 
@@ -66,7 +71,11 @@ pipeline {
     }
     stage('Delete Old Images'){
           steps{
-            sh 'echo "eski imagelari sil"' 
+               dir('web')
+                {
+                    sh "chmod 755 clean_docker_images"
+                    sh "./clean_docker_images ${env.BUILD_NUMBER} ${env.IMAGE_AGE} ${env.WEB_IMAGE}" 
+                }
           }
     }
     stage('ACI recreate orchestration') {
