@@ -71,7 +71,7 @@ pipeline {
     }
     stage('Delete Old Images'){
           steps{
-               dir('web')
+               dir('scripts')
                 {
                     sh "chmod 755 clean_docker_images"
                     sh "./clean_docker_images ${env.BUILD_NUMBER} ${env.IMAGE_AGE} ${env.WEB_IMAGE}" 
