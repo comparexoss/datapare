@@ -85,9 +85,11 @@ pipeline {
     stage('ACI recreate orchestration') {
         steps{
                dir('scripts')
-                {   
-                    sh "chmod 755 clean_docker_images"         
-                    sh 'echo "acilari recreate et"' 
+                {
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${env.azure-credentials}",usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {   
+                        sh "chmod 755 aci_orchestration"         
+                        sh "./aci_orchestration 'dp_comparex' 'acitest' ${env.WEB_IMAGE} ${env.WEB_CNTNR_COUNT} 'Linux' 'West Europe' 'Always' 'Public' $USERNAME $PASSWORD ${env.TENANT_ID} "
+                    }
                 }
         }
     }
