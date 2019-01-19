@@ -1,0 +1,63 @@
+#!/bin/bash
+
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+echo "Resource Group: $1" 
+echo "Container Name: $2"
+echo "Image Name: $3"
+echo "Container Count: $4"
+echo "OS Type: $5"
+echo "Location: $6"
+echo "Retart Policy: $7"
+echo "Ip Address Type: $8"
+
+[ "$#" -eq 11 ] || die "11 argument required, $# provided"
+
+RESOURCE_GROUP=$1
+CNTNR_NAME=$2
+IMAGE_NAME=$3
+CNTNR_COUNT=$4
+OS_TYPE=$5
+LOCATION=$6
+RESTART_POLICY=$7
+IP_ADDRESS_TYPE=$8
+
+#check variables if they have values, if they don't have any value, die()
+
+#login to Azure with credentials
+if ! [ $(az login --service-principal -u $9 -p $10 -t $11) ];  then
+    die "Could not connect to Azure with credentials. Terminating the script."
+fi
+
+
+#check resource group
+if ! [ $(az group exists -n "$RESOURCE_GROUP") ];  then
+    die "$RESOURCE_GROUP does not exist. Terminating the script."
+fi
+
+#get aci list in the resource group
+CONTAINER_LIST = (az container list -g $RESOURCE_GROUP --query 'name' -o table| grep -Eo "$CNTNR_NAME")
+
+#enumarate aci list and remove, if max CNTNR_COUNT has not been reached create new one.
+if [$CONTAINER_LIST -gt $CNTNR_COUNT]; then
+    i=1
+    for cntnr in $CONTAINER_LIST; do
+        az container delete -n "$cntnr" -g "$RESOURCE_GROUP" -y
+
+        if [$i -ne $CNTNR_COUNT]; then
+            az create container -n $cntnr -g $RESOURCE_GROUP --image $IMAGE_NAME -l $LOCATION --ip-address $IP_ADDRESS_TYPE --os-type $OS_TYPE --restart-policy $RESTART_POLICY
+            let i=i+1
+        fi
+
+    done
+else
+     i=1
+     while [ $i -le $CNTNR_COUNT ]; do
+        az create container -n "$CNTNR_NAME$i" -g $RESOURCE_GROUP --image $IMAGE_NAME -l $LOCATION --ip-address $IP_ADDRESS_TYPE --os-type $OS_TYPE --restart-policy $RESTART_POLICY
+        let i=i+1
+     done
+     
+fi

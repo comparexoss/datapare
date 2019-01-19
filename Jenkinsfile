@@ -1,9 +1,10 @@
 pipeline {
     environment {
+        TENANT_ID="d1b3fd06-9dad-4353-b489-be3e10a99364"
         GIT_REPO = "https://github.com/comparexoss/datapare.git"
         ACR_LOGINSERVER = "hakkiogretmen"
         //ACR_REPO = 'mstrdevopsworkshop'
-        //ACR_CRED = credentials('dockerhub')
+        ACR_CRED = credentials('dockerhub')
         //WEB_IMAGE="${env.ACR_LOGINSERVER}/${env.ACR_REPO}/rating-web"
         WEB_IMAGE="${env.ACR_LOGINSERVER}/rating-web"
         //API_IMAGE="${env.ACR_LOGINSERVER}/${env.ACR_REPO}/rating-api"
@@ -33,11 +34,14 @@ pipeline {
                 {
                     script{
                     docker.build("${env.API_IMAGE}:${env.BUILD_NUMBER}")
+                    docker.tag("${env.API_IMAGE}:latest")
                     }
+                    //sh "docker tag ${env.API_IMAGE}:${env.BUILD_NUMBER} ${env.API_IMAGE}:latest"
                 }
                 dir('web')
                 {
                    sh "docker build --build-arg BUILD_DATE=`date '+%Y-%m-%dT%H:%M:%SZ'` --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg IMAGE_TAG_REF=${env.BUILD_NUMBER} -t ${env.WEB_IMAGE}:${env.BUILD_NUMBER} ."
+                   sh "docker tag ${env.WEB_IMAGE}:${env.BUILD_NUMBER} ${env.WEB_IMAGE}:latest"
                 }    
             }
        }
@@ -57,14 +61,13 @@ pipeline {
 
     stage('Push images to ACR') {
         steps{
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${env.ACR_CRED}",usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             sh "docker login -u $USERNAME -p $PASSWORD"
+
             sh "docker push ${env.API_IMAGE}:${env.BUILD_NUMBER}"
-            sh "docker tag ${env.API_IMAGE}:${env.BUILD_NUMBER} ${env.API_IMAGE}:latest"
             sh "docker push ${env.API_IMAGE}:latest"
            
             sh "docker push ${env.WEB_IMAGE}:${env.BUILD_NUMBER}"
-            sh "docker tag ${env.WEB_IMAGE}:${env.BUILD_NUMBER} ${env.WEB_IMAGE}:latest"
             sh "docker push ${env.WEB_IMAGE}:latest"
             }
         }
@@ -75,12 +78,17 @@ pipeline {
                 {
                     sh "chmod 755 clean_docker_images"
                     sh "./clean_docker_images ${env.BUILD_NUMBER} ${env.IMAGE_AGE} ${env.WEB_IMAGE}" 
+                    sh "./clean_docker_images ${env.BUILD_NUMBER} ${env.IMAGE_AGE} ${env.API_IMAGE}" 
                 }
           }
     }
     stage('ACI recreate orchestration') {
         steps{
-            sh 'echo "acilari recreate et"' 
+               dir('scripts')
+                {   
+                    sh "chmod 755 clean_docker_images"         
+                    sh 'echo "acilari recreate et"' 
+                }
         }
     }
 }
