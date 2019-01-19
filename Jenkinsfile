@@ -3,7 +3,7 @@ pipeline {
         GIT_REPO = "https://github.com/comparexoss/datapare.git"
         ACR_LOGINSERVER = "hakkiogretmen"
         //ACR_REPO = 'mstrdevopsworkshop'
-        ACR_CRED = credentials('acr-credentials')
+        //ACR_CRED = credentials('dockerhub')
         //WEB_IMAGE="${env.ACR_LOGINSERVER}/${env.ACR_REPO}/rating-web"
         WEB_IMAGE="${env.ACR_LOGINSERVER}/rating-web"
         //API_IMAGE="${env.ACR_LOGINSERVER}/${env.ACR_REPO}/rating-api"
@@ -52,7 +52,7 @@ pipeline {
 
     stage('Push images to ACR') {
         steps{
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'acr-credentials',usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             sh "docker login -u $USERNAME -p $PASSWORD"
             sh "docker push ${env.API_IMAGE}:${env.BUILD_NUMBER}"
             sh "docker tag ${env.API_IMAGE}:${env.BUILD_NUMBER} ${env.API_IMAGE}:latest"
