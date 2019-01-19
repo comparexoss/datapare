@@ -34,9 +34,9 @@ pipeline {
                 {
                     script{
                     docker.build("${env.API_IMAGE}:${env.BUILD_NUMBER}")
-                    docker.tag("${env.API_IMAGE}:latest")
+                    //docker.tag("${env.API_IMAGE}:latest")
                     }
-                    //sh "docker tag ${env.API_IMAGE}:${env.BUILD_NUMBER} ${env.API_IMAGE}:latest"
+                    sh "docker tag ${env.API_IMAGE}:${env.BUILD_NUMBER} ${env.API_IMAGE}:latest"
                 }
                 dir('web')
                 {
