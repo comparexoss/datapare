@@ -42,7 +42,7 @@ if ! [ $(az group exists -n "$RESOURCE_GROUP") ];  then
 fi
 
 #get aci list in the resource group
-CONTAINER_LIST = (az container list -g $RESOURCE_GROUP --query 'name' -o table| grep -Eo "$CNTNR_NAME")
+CONTAINER_LIST = $(az container list -g $RESOURCE_GROUP --query 'name' -o table| grep -Eo "$CNTNR_NAME")
 
 #enumarate aci list and remove, if max CNTNR_COUNT has not been reached create new one.
 if [$CONTAINER_LIST -gt $CNTNR_COUNT]; then
