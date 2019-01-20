@@ -86,7 +86,8 @@ pipeline {
                dir('scripts')
                 {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "azure-credentials",usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {   
-                        sh "chmod 755 aci_orchestration"         
+                        sh "chmod 755 aci_orchestration"
+                        sh "az login --service-principal -u $USERNAME -p $PASSWORD -t ${env.TENANT_ID}"         
                         sh "./aci_orchestration 'dp_comparex' 'acitest' ${env.WEB_IMAGE} ${env.WEB_CNTNR_COUNT} 'Linux' 'West Europe' 'Always' 'Public' $USERNAME $PASSWORD ${env.TENANT_ID} "
                     }
                 }

@@ -31,9 +31,9 @@ IP_ADDRESS_TYPE=$8
 #check variables if they have values, if they don't have any value, die()
 
 #login to Azure with credentials
-if ! [ $(az login --service-principal -u $9 -p ${10} -t ${11}) ];  then
-    die "Could not connect to Azure with credentials. Terminating the script."
-fi
+#if ! [ $(az login --service-principal -u $9 -p ${10} -t ${11}) ];  then
+ #   die "Could not connect to Azure with credentials. Terminating the script."
+#fi
 
 
 #check resource group
