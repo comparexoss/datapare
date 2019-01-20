@@ -14,8 +14,8 @@ echo "Location: $6"
 echo "Retart Policy: $7"
 echo "Ip Address Type: $8"
 echo "app Id: $9"
-echo "password: $10"
-echo "tenant Id: $11"
+echo "password: ${10}"
+echo "tenant Id: ${11}"
 
 [ "$#" -eq 11 ] || die "11 argument required, $# provided"
 
@@ -31,7 +31,7 @@ IP_ADDRESS_TYPE=$8
 #check variables if they have values, if they don't have any value, die()
 
 #login to Azure with credentials
-if ! [ $(az login --service-principal -u $9 -p $10 -t $11) ];  then
+if ! [ $(az login --service-principal -u $9 -p ${10} -t ${11}) ];  then
     die "Could not connect to Azure with credentials. Terminating the script."
 fi
 
