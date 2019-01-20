@@ -13,6 +13,9 @@ echo "OS Type: $5"
 echo "Location: $6"
 echo "Retart Policy: $7"
 echo "Ip Address Type: $8"
+echo "app Id: $9"
+echo "password: $10"
+echo "tenant Id: $11"
 
 [ "$#" -eq 11 ] || die "11 argument required, $# provided"
 
