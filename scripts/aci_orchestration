@@ -45,13 +45,13 @@ fi
 CONTAINER_LIST = $(az container list -g $RESOURCE_GROUP --query 'name' -o table| grep -Eo "$CNTNR_NAME")
 
 #enumarate aci list and remove, if max CNTNR_COUNT has not been reached create new one.
-if [$CONTAINER_LIST -gt $CNTNR_COUNT]; then
+if [${#CONTAINER_LIST[@]} -gt $CNTNR_COUNT]; then
     i=1
     for cntnr in $CONTAINER_LIST; do
         az container delete -n "$cntnr" -g "$RESOURCE_GROUP" -y
 
         if [$i -ne $CNTNR_COUNT]; then
-            az create container -n $cntnr -g $RESOURCE_GROUP --image $IMAGE_NAME -l $LOCATION --ip-address $IP_ADDRESS_TYPE --os-type $OS_TYPE --restart-policy $RESTART_POLICY
+            az container create -n $cntnr -g $RESOURCE_GROUP --image $IMAGE_NAME -l $LOCATION --ip-address $IP_ADDRESS_TYPE --os-type $OS_TYPE --restart-policy $RESTART_POLICY
             let i=i+1
         fi
 
@@ -59,7 +59,7 @@ if [$CONTAINER_LIST -gt $CNTNR_COUNT]; then
 else
      i=1
      while [ $i -le $CNTNR_COUNT ]; do
-        az create container -n "$CNTNR_NAME$i" -g $RESOURCE_GROUP --image $IMAGE_NAME -l $LOCATION --ip-address $IP_ADDRESS_TYPE --os-type $OS_TYPE --restart-policy $RESTART_POLICY
+        az container create -n "$CNTNR_NAME$i" -g $RESOURCE_GROUP --image $IMAGE_NAME -l $LOCATION --ip-address $IP_ADDRESS_TYPE --os-type $OS_TYPE --restart-policy $RESTART_POLICY
         let i=i+1
      done
      
